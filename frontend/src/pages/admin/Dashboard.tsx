@@ -11,9 +11,9 @@ export default function Dashboard() {
   // service form
   const [sf, setSf] = useState({
     title: "",
-    category: "Стрижки",
-    price: "" as any,
-    durationMin: "" as any
+    category: "Стрижка",
+    price: 30,
+    durationMin: 30
   });
   const [servicePhoto, setServicePhoto] = useState<File | null>(null);
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
     if (servicePhoto) fd.append("photo", servicePhoto);
 
     await adminApi.createService(token, fd);
-    setSf({ title: "", category: "Стрижки", price: "" as any, durationMin: "" as any });
+    setSf({ title: "", category: "Стрижка", price: 30, durationMin: 30 });
     setServicePhoto(null);
     load();
   }
@@ -94,30 +94,31 @@ export default function Dashboard() {
         <form onSubmit={addService} className="card">
           <div className="card-body grid grid-cols-1 md:grid-cols-6 gap-3">
             <input className="input md:col-span-2" placeholder="Название"
-              value={sf.title} onChange={e => setSf(v => ({ ...v, title: e.target.value }))} required />
+              value={sf.title} onChange={e=>setSf(v=>({...v,title:e.target.value}))} required />
 
             <select className="select" value={sf.category}
-              onChange={e => setSf(v => ({ ...v, category: e.target.value }))}>
-              <option>Стрижки</option>
-              <option>Комплексы</option>
-              <option>Другие услуги</option>
+              onChange={e=>setSf(v=>({...v,category:e.target.value}))}>
+              <option>Стрижка</option>
+              <option>Борода</option>
+              <option>Комбо</option>
+              <option>Окрашивание</option>
             </select>
 
-            <input className="input" type="number" placeholder="Цена (BYN)"
-              value={sf.price} onChange={e => setSf(v => ({ ...v, price: e.target.value ? Number(e.target.value) : "" }))} required />
+            <input className="input" type="number" placeholder="Цена BYN"
+              value={sf.price} onChange={e=>setSf(v=>({...v,price:Number(e.target.value)}))} required />
 
-            <input className="input" type="number" placeholder="Длительность (мин)"
-              value={sf.durationMin} onChange={e => setSf(v => ({ ...v, durationMin: e.target.value ? Number(e.target.value) : "" }))} required />
+            <input className="input" type="number" placeholder="Минуты"
+              value={sf.durationMin} onChange={e=>setSf(v=>({...v,durationMin:Number(e.target.value)}))} required />
 
             <input className="input" type="file" accept="image/*"
-              onChange={e => setServicePhoto(e.target.files?.[0] ?? null)} />
+              onChange={e=>setServicePhoto(e.target.files?.[0] ?? null)} />
 
             <button className="btn md:col-span-6">Добавить услугу</button>
           </div>
         </form>
 
         <div className="grid md:grid-cols-2 gap-3">
-          {services.map(s => (
+          {services.map(s=>(
             <div key={s.id} className="card p-3 flex gap-3">
               {s.photo && <img src={toAbsUrl(s.photo)} className="w-24 h-20 object-cover rounded-xl" />}
               <div className="flex-1">
@@ -126,10 +127,10 @@ export default function Dashboard() {
                 <div className="font-bold">{s.price} BYN</div>
               </div>
               <div className="flex flex-col gap-2">
-                <button onClick={() => toggleService(s)} className="btn-outline text-xs px-2 py-1">
+                <button onClick={()=>toggleService(s)} className="btn-outline text-xs px-2 py-1">
                   {s.isActive ? "Скрыть" : "Показать"}
                 </button>
-                <button onClick={() => delService(s.id)} className="btn-danger text-xs px-2 py-1">
+                <button onClick={()=>delService(s.id)} className="btn-danger text-xs px-2 py-1">
                   Удалить
                 </button>
               </div>
@@ -144,22 +145,22 @@ export default function Dashboard() {
 
         <form onSubmit={addGallery} className="card">
           <div className="card-body flex flex-col md:flex-row gap-3">
-            <input className="input flex-1" placeholder="Подпись" value={gc} onChange={e => setGc(e.target.value)} />
-            <input className="input" type="file" accept="image/*" onChange={e => setGp(e.target.files?.[0] ?? null)} required />
+            <input className="input flex-1" placeholder="Подпись" value={gc} onChange={e=>setGc(e.target.value)} />
+            <input className="input" type="file" accept="image/*" onChange={e=>setGp(e.target.files?.[0] ?? null)} required />
             <button className="btn">Добавить</button>
           </div>
         </form>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {gallery.map(g => (
+          {gallery.map(g=>(
             <div key={g.id} className="rounded-xl overflow-hidden border border-neutral-800 bg-neutral-900">
               <img src={toAbsUrl(g.photo)} className="h-32 w-full object-cover" />
               <div className="p-2 text-xs text-neutral-300">{g.caption || "—"}</div>
               <div className="flex">
-                <button onClick={() => toggleGallery(g)} className="flex-1 text-xs py-2 border-t border-neutral-800">
+                <button onClick={()=>toggleGallery(g)} className="flex-1 text-xs py-2 border-t border-neutral-800">
                   {g.isActive ? "Скрыть" : "Показать"}
                 </button>
-                <button onClick={() => delGallery(g.id)} className="flex-1 text-xs py-2 border-t border-neutral-800 text-red-300">
+                <button onClick={()=>delGallery(g.id)} className="flex-1 text-xs py-2 border-t border-neutral-800 text-red-300">
                   Удалить
                 </button>
               </div>
