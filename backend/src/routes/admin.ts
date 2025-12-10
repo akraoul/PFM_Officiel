@@ -31,6 +31,12 @@ router.post("/barbers", uploader.barber.single("photo"), Admin.createBarber);
 router.put("/barbers/:id", Admin.updateBarber);
 router.delete("/barbers/:id", Admin.deleteBarber);
 
+// Barber Availability
+router.get("/barbers/:barberId/availability", Admin.getBarberAvailability);
+router.post("/barbers/:barberId/availability", Admin.createBarberAvailability);
+router.put("/barbers/availability/:id", Admin.updateBarberAvailability);
+router.delete("/barbers/availability/:id", Admin.deleteBarberAvailability);
+
 // Gallery
 router.get("/gallery", Admin.getGalleryAdmin);
 router.post("/gallery", uploader.gallery.single("photo"), Admin.uploadGallery);
@@ -48,5 +54,8 @@ router.get("/reviews", Admin.getReviewsAdmin); // Need admin specific listing?
 router.patch("/reviews/:id/approve", Admin.approveReview); // Frontend calls via PUT /reviews/:id/approve ? Checked api: PUT /reviews/:id/approve
 router.put("/reviews/:id/note", Admin.setReviewNote);
 router.delete("/reviews/:id", Admin.deleteReview);
+
+// History
+router.get("/bookings/history", Admin.getBookingsHistory);
 
 export default router;

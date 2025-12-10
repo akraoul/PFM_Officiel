@@ -29,13 +29,29 @@ export default function Booking() {
   const [blocked, setBlocked] = useState<{ startAt: string; endAt: string }[]>([]);
   const [code, setCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     (async () => {
       setServices(await clientApi.services());
-      setBarbers(await clientApi.barbers());
     })();
   }, []);
+
+  // Reload barbers when date changes
+  useEffect(() => {
+    if (!date) {
+      setBarbers([]);
+      return;
+    }
+    (async () => {
+      const barbersForDate = await clientApi.barbers(date);
+      setBarbers(barbersForDate);
+      // Reset barber selection if currently selected barber is not available
+      if (barberId && !barbersForDate.find((b: any) => b.id === barberId)) {
+        setBarberId("");
+      }
+    })();
+  }, [date]);
 
   useEffect(() => {
     if (!barberId || !date) return;
@@ -121,7 +137,20 @@ export default function Booking() {
         <div className="card border-green-700 bg-green-900/10">
           <div className="card-body">
             <div className="font-semibold text-green-400">Ваш код бронирования:</div>
-            <div className="text-3xl font-bold mt-2 font-mono">{code}</div>
+            <div className="flex items-center gap-3 mt-2">
+              <div className="text-3xl font-bold font-mono">{code}</div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(code);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="px-3 py-1 rounded-lg border border-green-500/30 hover:bg-green-500/20 text-green-400 text-sm transition"
+              >
+                {copied ? "Скопировано! ✅" : "Копировать 📋"}
+              </button>
+            </div>
             <div className="text-sm text-neutral-400 mt-2">Сохраните его для проверки.</div>
           </div>
         </div>

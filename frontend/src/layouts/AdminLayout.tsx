@@ -68,7 +68,7 @@ export default function AdminLayout() {
           <img src="/assets/logo/PFM_white.png" alt="PFM Logo" className="h-10 w-auto object-contain" />
           <div>
             <div className="font-bold">Админ-панель</div>
-            <div className="text-xs text-neutral-500">PFM Barbershop</div>
+            <div className="text-xs text-neutral-500">PFM - ESCOBAR</div>
           </div>
         </div>
 
@@ -77,6 +77,7 @@ export default function AdminLayout() {
             <>
               <NavLink to="/admin" end className={linkClass} onClick={() => setSidebarOpen(false)}>📊 Панель</NavLink>
               <NavLink to="/admin/barbers" className={linkClass} onClick={() => setSidebarOpen(false)}>✂️ Барберы</NavLink>
+              <NavLink to="/admin/barber-availability" className={linkClass} onClick={() => setSidebarOpen(false)}>📆 Доступность</NavLink>
               <NavLink to="/admin/bookings" className={linkClass} onClick={() => setSidebarOpen(false)}>📅 Записи</NavLink>
               <NavLink to="/admin/history" className={linkClass} onClick={() => setSidebarOpen(false)}>🗂 История</NavLink>
               <NavLink to="/admin/promotions" className={linkClass} onClick={() => setSidebarOpen(false)}>🏷 Акции</NavLink>

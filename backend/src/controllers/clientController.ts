@@ -11,8 +11,30 @@ export const getServices = (_req: Request, res: Response) => {
 };
 
 // -- GET /api/barbers
-export const getBarbers = (_req: Request, res: Response) => {
-    db.all("SELECT * FROM barbers ORDER BY createdAt DESC", [], (err, rows) => {
+export const getBarbers = (req: Request, res: Response) => {
+    const { date } = req.query;
+
+    // If no date provided, return all barbers
+    if (!date || typeof date !== 'string') {
+        db.all("SELECT * FROM barbers WHERE isActive=1 ORDER BY createdAt DESC", [], (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(rows);
+        });
+        return;
+    }
+
+    // Filter barbers by availability for the given date
+    const sql = `
+        SELECT b.* FROM barbers b
+        WHERE b.isActive = 1
+        AND b.id NOT IN (
+            SELECT barberId FROM barber_availability
+            WHERE ? BETWEEN date(startDate) AND date(endDate)
+        )
+        ORDER BY b.createdAt DESC
+    `;
+
+    db.all(sql, [date], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });

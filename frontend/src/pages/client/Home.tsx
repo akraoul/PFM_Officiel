@@ -25,13 +25,18 @@ export default function Home() {
   return (
     <div className="space-y-10">
       <section className="space-y-2">
-        <h1 className="text-3xl font-bold">Добро пожаловать в PFM Barbershop</h1>
+        <h1 className="text-3xl font-bold">Добро пожаловать в PFM - ESCOBAR</h1>
         <p className="text-neutral-400 text-lg">Запишитесь на стрижку за пару кликов.</p>
 
         <div className="text-sm text-neutral-500 pt-2 space-y-1">
           <div>🕒 Пн–Сб: 10:00–22:00</div>
           <div>🕒 Вс: 11:00–22:00</div>
           <div>📍 Минск, НЕМАНСКАЯ, 20</div>
+          <div className="pt-2 font-medium text-white text-base">📞 +375 29 667 09 06</div>
+          <a href="https://www.instagram.com/pfm_escobar?igsh=MWZoZ21jbno5bnB6NQ==" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-neutral-400 hover:text-brand-green w-fit transition pt-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+            <span>Instagram</span>
+          </a>
         </div>
       </section>
 

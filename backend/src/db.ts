@@ -117,6 +117,22 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_history_bookingId ON booking_history(bookingId)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_history_actionAt ON booking_history(actionAt)`);
 
+  // barber_availability
+  db.run(`
+    CREATE TABLE IF NOT EXISTS barber_availability (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      barberId INTEGER NOT NULL,
+      startDate TEXT NOT NULL,
+      endDate TEXT NOT NULL,
+      reason TEXT,
+      createdAt TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (barberId) REFERENCES barbers(id) ON DELETE CASCADE
+    )
+  `);
+
+  db.run(`CREATE INDEX IF NOT EXISTS idx_availability_barber ON barber_availability(barberId)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_availability_dates ON barber_availability(startDate, endDate)`);
+
   // -- MIGRATIONS (columns missing in old DB) --
   const migration = (sql: string) => {
     db.run(sql, function (err) {
@@ -147,6 +163,7 @@ db.serialize(() => {
 
   // Bookings (just in case)
   migration("ALTER TABLE bookings ADD COLUMN createdAt TEXT");
+  migration("ALTER TABLE bookings ADD COLUMN cancellationReason TEXT");
   db.run("UPDATE bookings SET createdAt = datetime('now') WHERE createdAt IS NULL");
 });
 

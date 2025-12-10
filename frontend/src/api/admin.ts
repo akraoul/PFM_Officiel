@@ -95,6 +95,7 @@ export type Booking = {
   status: BookingStatus;
   barberName?: string;
   serviceTitle?: string;
+  cancellationReason?: string | null;
 };
 
 export type Paged<T> = {
@@ -205,24 +206,24 @@ export const adminApi = {
 
   // ================= PROMOTIONS (V2 upload) =================
   promotions: (token: string) =>
-  fetch(`${API}/admin/promotions`, {
-    headers: { "x-admin-token": token }
-  })
-    .then(json<any[]>)
-    .then(rows =>
-      rows.map(r => ({
-        ...r,
-        discountPercent: r.price
-      }))
-    ),
+    fetch(`${API}/admin/promotions`, {
+      headers: { "x-admin-token": token }
+    })
+      .then(json<any[]>)
+      .then(rows =>
+        rows.map(r => ({
+          ...r,
+          discountPercent: r.price
+        }))
+      ),
 
 
   createPromotion: (token: string, formData: FormData) =>
-  fetch(`${API}/admin/promotions`, {
-    method: "POST",
-    headers: { "x-admin-token": token },
-    body: formData
-  }).then(json<{ id: number; photo: string | null }>),
+    fetch(`${API}/admin/promotions`, {
+      method: "POST",
+      headers: { "x-admin-token": token },
+      body: formData
+    }).then(json<{ id: number; photo: string | null }>),
 
   updatePromotion: (token: string, id: number, payload: Partial<Promotion>) =>
     fetch(`${API}/admin/promotions/${id}`, {
@@ -278,14 +279,14 @@ export const adminApi = {
       headers: { "x-admin-token": token }
     }).then(json<Paged<Booking>>),
 
-  setBookingStatus: (token: string, id: number, status: BookingStatus) =>
+  setBookingStatus: (token: string, id: number, status: BookingStatus, cancellationReason?: string) =>
     fetch(`${API}/admin/bookings/${id}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         "x-admin-token": token
       },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status, cancellationReason })
     }).then(json<{ changed: number }>),
 
   deleteBooking: (token: string, id: number) =>
@@ -309,5 +310,27 @@ export const adminApi = {
       {
         headers: { "x-admin-token": token }
       }
-    ).then(json<any[]>)
+    ).then(json<any[]>),
+
+  // ================= BARBER AVAILABILITY =================
+  getBarberAvailability: (token: string, barberId: number) =>
+    fetch(`${API}/admin/barbers/${barberId}/availability`, {
+      headers: { "x-admin-token": token }
+    }).then(json<any[]>),
+
+  createBarberAvailability: (token: string, barberId: number, payload: { startDate: string; endDate: string; reason?: string }) =>
+    fetch(`${API}/admin/barbers/${barberId}/availability`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-token": token
+      },
+      body: JSON.stringify(payload)
+    }).then(json<{ id: number; success: boolean }>),
+
+  deleteBarberAvailability: (token: string, id: number) =>
+    fetch(`${API}/admin/barbers/availability/${id}`, {
+      method: "DELETE",
+      headers: { "x-admin-token": token }
+    }).then(json<{ success: boolean }>)
 };

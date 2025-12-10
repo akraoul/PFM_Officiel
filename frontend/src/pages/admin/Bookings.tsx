@@ -82,7 +82,15 @@ export default function Bookings() {
 
   async function setStatus(id: number, status: BookingStatus) {
     if (!token) return;
-    await adminApi.setBookingStatus(token, id, status);
+
+    let reason: string | undefined = undefined;
+    if (status === "cancelled") {
+      const r = prompt("Причина отмены (необязательно):");
+      if (r === null) return; // cancelled prompt
+      reason = r;
+    }
+
+    await adminApi.setBookingStatus(token, id, status, reason);
     load(page);
     loadMeta();
   }

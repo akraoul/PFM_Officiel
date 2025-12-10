@@ -16,7 +16,8 @@ db.serialize(() => {
       price INTEGER NOT NULL,
       durationMin INTEGER NOT NULL,
       photo TEXT,
-      isActive INTEGER DEFAULT 1
+      isActive INTEGER DEFAULT 1,
+      createdAt TEXT DEFAULT (datetime('now'))
     )
   `);
     // barbers
@@ -26,7 +27,8 @@ db.serialize(() => {
       name TEXT NOT NULL,
       role TEXT DEFAULT 'Барбер',
       photo TEXT NOT NULL,
-      isActive INTEGER DEFAULT 1
+      isActive INTEGER DEFAULT 1,
+      createdAt TEXT DEFAULT (datetime('now'))
     )
   `);
     // gallery
@@ -39,28 +41,32 @@ db.serialize(() => {
       createdAt TEXT DEFAULT (datetime('now'))
     )
   `);
-    // promotions (si déjà existant chez toi)
+    // promotions
     db.run(`
     CREATE TABLE IF NOT EXISTS promotions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
       description TEXT,
       photo TEXT,
-      isActive INTEGER DEFAULT 1
+      expiresAt TEXT,
+      price INTEGER,
+      isActive INTEGER DEFAULT 1,
+      createdAt TEXT DEFAULT (datetime('now'))
     )
   `);
-    // reviews (si déjà existant chez toi)
+    // reviews
     db.run(`
     CREATE TABLE IF NOT EXISTS reviews (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       clientName TEXT NOT NULL,
       rating INTEGER NOT NULL,
       comment TEXT NOT NULL,
-      isApproved INTEGER DEFAULT 0,
+      approved INTEGER DEFAULT 0,
+      adminNote TEXT,
       createdAt TEXT DEFAULT (datetime('now'))
     )
   `);
-    // bookings
+    // bookings ... (unchanged)
     db.run(`
     CREATE TABLE IF NOT EXISTS bookings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,10 +79,11 @@ db.serialize(() => {
       endAt TEXT NOT NULL,
       peopleCount INTEGER DEFAULT 1,
       note TEXT,
-      status TEXT DEFAULT 'pending'
+      status TEXT DEFAULT 'pending',
+      createdAt TEXT DEFAULT (datetime('now'))
     )
   `);
-    // booking history
+    // ... (history unchanged)
     db.run(`
     CREATE TABLE IF NOT EXISTS booking_history (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,5 +104,46 @@ db.serialize(() => {
   `);
     db.run(`CREATE INDEX IF NOT EXISTS idx_history_bookingId ON booking_history(bookingId)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_history_actionAt ON booking_history(actionAt)`);
+    // barber_availability
+    db.run(`
+    CREATE TABLE IF NOT EXISTS barber_availability (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      barberId INTEGER NOT NULL,
+      startDate TEXT NOT NULL,
+      endDate TEXT NOT NULL,
+      reason TEXT,
+      createdAt TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (barberId) REFERENCES barbers(id) ON DELETE CASCADE
+    )
+  `);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_availability_barber ON barber_availability(barberId)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_availability_dates ON barber_availability(startDate, endDate)`);
+    // -- MIGRATIONS (columns missing in old DB) --
+    const migration = (sql) => {
+        db.run(sql, function (err) {
+            if (err && !err.message.includes("duplicate column name")) {
+                console.error("Migration failed:", sql, err.message);
+            }
+        });
+    };
+    // Services
+    migration("ALTER TABLE services ADD COLUMN createdAt TEXT");
+    db.run("UPDATE services SET createdAt = datetime('now') WHERE createdAt IS NULL");
+    // Barbers
+    migration("ALTER TABLE barbers ADD COLUMN createdAt TEXT");
+    db.run("UPDATE barbers SET createdAt = datetime('now') WHERE createdAt IS NULL");
+    // Promotions
+    migration("ALTER TABLE promotions ADD COLUMN expiresAt TEXT");
+    migration("ALTER TABLE promotions ADD COLUMN createdAt TEXT");
+    migration("ALTER TABLE promotions ADD COLUMN price INTEGER"); // Used as discountPercent in frontend
+    db.run("UPDATE promotions SET createdAt = datetime('now') WHERE createdAt IS NULL");
+    db.run("UPDATE promotions SET price = 0 WHERE price IS NULL");
+    // Reviews
+    migration("ALTER TABLE reviews ADD COLUMN adminNote TEXT");
+    migration("ALTER TABLE reviews ADD COLUMN approved INTEGER DEFAULT 0"); // Constant default is OK
+    // Bookings (just in case)
+    migration("ALTER TABLE bookings ADD COLUMN createdAt TEXT");
+    migration("ALTER TABLE bookings ADD COLUMN cancellationReason TEXT");
+    db.run("UPDATE bookings SET createdAt = datetime('now') WHERE createdAt IS NULL");
 });
 export default db;

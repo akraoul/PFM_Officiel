@@ -95,7 +95,7 @@ export const getDashboardStats = (_req: Request, res: Response) => {
 
 // -- GET /api/admin/bookings
 export const getBookings = (req: Request, res: Response) => {
-    const { date, status } = req.query;
+    const { date, status, barberId, q } = req.query;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const offset = (page - 1) * limit;
@@ -115,6 +115,15 @@ export const getBookings = (req: Request, res: Response) => {
     if (status) {
         baseSql += " AND b.status = ?";
         params.push(status);
+    }
+    if (barberId) {
+        baseSql += " AND b.barberId = ?";
+        params.push(Number(barberId));
+    }
+    if (q && typeof q === 'string') {
+        baseSql += " AND (b.code LIKE ? OR b.clientName LIKE ? OR b.clientPhone LIKE ?)";
+        const search = `%${q}%`;
+        params.push(search, search, search);
     }
 
     // 1. Count Total
@@ -147,9 +156,9 @@ export const getBookings = (req: Request, res: Response) => {
 // -- PUT /api/admin/bookings/:id/status
 export const updateBookingStatus = (req: Request, res: Response) => {
     const { id } = req.params;
-    const { status } = req.body; // 'confirmed', 'cancelled', 'completed'
+    const { status, cancellationReason } = req.body; // 'confirmed', 'cancelled', 'completed'
 
-    if (!["confirmed", "cancelled", "completed", "pending"].includes(status)) {
+    if (!["confirmed", "cancelled", "done", "pending"].includes(status)) {
         return res.status(400).json({ error: "Invalid status" });
     }
 
@@ -158,16 +167,28 @@ export const updateBookingStatus = (req: Request, res: Response) => {
         if (err) return res.status(500).json({ error: err.message });
         if (!row) return res.status(404).json({ error: "Not found" });
 
-        // 2. Update
-        db.run("UPDATE bookings SET status=? WHERE id=?", [status, id], function (err2) {
-            if (err2) return res.status(500).json({ error: err2.message });
-
-            // 3. History
-            const updated = { ...row, status };
+        // 2. If status is 'done', move to history and delete
+        if (status === 'done') {
+            const updated = { ...row, status: 'done' };
             pushHistory(updated, "status_change");
 
-            res.json({ success: true });
-        });
+            db.run("DELETE FROM bookings WHERE id=?", [id], function (err2) {
+                if (err2) return res.status(500).json({ error: err2.message });
+                res.json({ success: true, movedToHistory: true });
+            });
+        } else {
+            // 3. Otherwise, update status normally
+            const reason = status === 'cancelled' ? cancellationReason : null;
+            db.run("UPDATE bookings SET status=?, cancellationReason=? WHERE id=?", [status, reason, id], function (err2) {
+                if (err2) return res.status(500).json({ error: err2.message });
+
+                // 4. History
+                const updated = { ...row, status, cancellationReason: reason };
+                pushHistory(updated, "status_change");
+
+                res.json({ success: true });
+            });
+        }
     });
 };
 
@@ -346,6 +367,86 @@ export const deletePromotion = (req: Request, res: Response) => {
 
 export const deleteReview = (req: Request, res: Response) => {
     db.run("DELETE FROM reviews WHERE id=?", [req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
+};
+
+// -- BOOKINGS HISTORY --
+export const getBookingsHistory = (req: Request, res: Response) => {
+    const { q } = req.query;
+    let sql = `
+        SELECT bh.*, s.title as serviceTitle, b.name as barberName
+        FROM booking_history bh
+        LEFT JOIN services s ON bh.serviceId = s.id
+        LEFT JOIN barbers b ON bh.barberId = b.id
+    `;
+    const params: any[] = [];
+
+    if (q && typeof q === 'string') {
+        sql += ` WHERE bh.code LIKE ? OR bh.clientName LIKE ? OR bh.clientPhone LIKE ?`;
+        const search = `%${q}%`;
+        params.push(search, search, search);
+    }
+
+    sql += ` ORDER BY bh.actionAt DESC LIMIT 100`;
+
+    db.all(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+};
+
+// -- BARBER AVAILABILITY --
+export const getBarberAvailability = (req: Request, res: Response) => {
+    const { barberId } = req.params;
+
+    db.all(
+        "SELECT * FROM barber_availability WHERE barberId = ? ORDER BY startDate ASC",
+        [barberId],
+        (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(rows);
+        }
+    );
+};
+
+export const createBarberAvailability = (req: Request, res: Response) => {
+    const { barberId } = req.params;
+    const { startDate, endDate, reason } = req.body;
+
+    if (!startDate || !endDate) {
+        return res.status(400).json({ error: "startDate and endDate are required" });
+    }
+
+    db.run(
+        "INSERT INTO barber_availability (barberId, startDate, endDate, reason) VALUES (?, ?, ?, ?)",
+        [barberId, startDate, endDate, reason || null],
+        function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ id: this.lastID, success: true });
+        }
+    );
+};
+
+export const updateBarberAvailability = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { startDate, endDate, reason } = req.body;
+
+    db.run(
+        "UPDATE barber_availability SET startDate = COALESCE(?, startDate), endDate = COALESCE(?, endDate), reason = COALESCE(?, reason) WHERE id = ?",
+        [startDate, endDate, reason, id],
+        function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ changed: this.changes });
+        }
+    );
+};
+
+export const deleteBarberAvailability = (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    db.run("DELETE FROM barber_availability WHERE id = ?", [id], function (err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ success: true });
     });

@@ -37,6 +37,9 @@ export default function CheckBooking() {
             <div><b>Услуга:</b> {data.serviceTitle}</div>
             <div><b>Начало:</b> {new Date(data.startAt).toLocaleString("ru-RU")}</div>
             <div><b>Статус:</b> {data.status}</div>
+            {data.status === "cancelled" && data.cancellationReason && (
+              <div className="text-red-400"><b>Причина отмены:</b> {data.cancellationReason}</div>
+            )}
           </div>
         </div>
       )}

@@ -7,7 +7,10 @@ async function json<T>(r: Response): Promise<T> {
 
 export const clientApi = {
   services: () => fetch(`${API}/services`).then(json<any[]>),
-  barbers: () => fetch(`${API}/barbers`).then(json<any[]>),
+  barbers: (date?: string) => {
+    const url = date ? `${API}/barbers?date=${date}` : `${API}/barbers`;
+    return fetch(url).then(json<any[]>);
+  },
   gallery: () => fetch(`${API}/gallery`).then(json<any[]>),
 
   promotions: () => fetch(`${API}/promotions`).then(json<any[]>),

@@ -17,7 +17,7 @@ export default function ClientLayout() {
           <NavLink to="/" className="flex items-center gap-3 group" onClick={() => setMenuOpen(false)}>
             <img src="/assets/logo/PFM_white.png" alt="PFM" className="h-16 w-auto object-contain group-hover:scale-105 transition" />
             <div className="leading-tight">
-              <div className="font-bold text-lg tracking-tight">PFM Barbershop</div>
+              <div className="font-bold text-lg tracking-tight">PFM - ESCOBAR</div>
               <div className="text-xs text-brand-gray">Минск • НЕМАНСКАЯ, 20</div>
             </div>
           </NavLink>
@@ -63,9 +63,13 @@ export default function ClientLayout() {
                 <NavLink to="/promotions" className={linkClass} onClick={() => setMenuOpen(false)}>🔥 Акции</NavLink>
                 <NavLink to="/reviews" className={linkClass} onClick={() => setMenuOpen(false)}>⭐ Отзывы</NavLink>
               </div>
-              <div className="p-4 border-t border-white/5 text-center text-xs text-brand-gray">
-                <div className="mb-1">📍 Минск, ул. НЕМАНСКАЯ, 20</div>
-                <div>📞 +375 (29) 123-45-67</div>
+              <div className="p-4 border-t border-white/5 text-center text-xs text-brand-gray space-y-2">
+                <div>📍 Минск, ул. НЕМАНСКАЯ, 20</div>
+                <div>📞 +375 29 667 09 06</div>
+                <a href="https://www.instagram.com/pfm_escobar?igsh=MWZoZ21jbno5bnB6NQ==" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 justify-center text-neutral-400 hover:text-white transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+                  <span>Instagram</span>
+                </a>
               </div>
             </div>
           )
@@ -79,8 +83,13 @@ export default function ClientLayout() {
       <footer className="border-t border-neutral-900 bg-neutral-950">
         <div className="mx-auto max-w-6xl px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
           <div className="space-y-2">
-            <div className="font-semibold">PFM Barbershop</div>
+            <div className="font-semibold">PFM - ESCOBAR</div>
             <div className="text-neutral-400">Профессиональные стрижки и уход за бородой в Минске.</div>
+            <div className="flex gap-4 pt-2">
+              <a href="https://www.instagram.com/pfm_escobar?igsh=MWZoZ21jbno5bnB6NQ==" target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-brand-green transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+              </a>
+            </div>
           </div>
           <div className="space-y-2">
             <div className="font-semibold">Время работы</div>
@@ -88,9 +97,10 @@ export default function ClientLayout() {
             <div className="text-neutral-300">Вс: 11:00–22:00</div>
           </div>
           <div className="space-y-2">
-            <div className="font-semibold">Адрес</div>
+            <div className="font-semibold">Контакты</div>
             <div className="text-neutral-300">Минск, НЕМАНСКАЯ, 20</div>
-            <div className="text-neutral-500 text-xs">© {new Date().getFullYear()} PFM Barbershop</div>
+            <div className="text-neutral-300">📞 +375 29 667 09 06</div>
+            <div className="text-neutral-500 text-xs mt-4">© {new Date().getFullYear()} PFM - ESCOBAR</div>
           </div>
         </div>
       </footer>

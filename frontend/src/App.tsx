@@ -19,6 +19,7 @@ import Bookings from "./pages/admin/Bookings";
 import History from "./pages/admin/History";
 import PromotionsAdmin from "./pages/admin/Promotions";
 import ReviewsAdmin from "./pages/admin/Reviews";
+import BarberAvailability from "./pages/admin/BarberAvailability";
 
 
 export default function App() {
@@ -41,6 +42,7 @@ export default function App() {
           <Route element={<RequireAdmin />}>
             <Route index element={<Dashboard />} />
             <Route path="barbers" element={<Barbers />} />
+            <Route path="barber-availability" element={<BarberAvailability />} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="history" element={<History />} />
             <Route path="promotions" element={<PromotionsAdmin />} />
