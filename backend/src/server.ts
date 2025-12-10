@@ -18,9 +18,9 @@ app.use(express.json());
 // -- STATIC FILES --
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// In production (dist/src/server.js), go up to dist/ then uploads
+// In production (dist/server.js), uploads is at dist/uploads
 const uploadsPath = process.env.NODE_ENV === 'production'
-  ? path.join(__dirname, '../../uploads')
+  ? path.join(__dirname, '../uploads')
   : path.join(__dirname, '../uploads');
 app.use('/uploads', express.static(uploadsPath));
 
