@@ -6,74 +6,49 @@ Application de réservation en ligne pour le salon de coiffure PFM - ESCOBAR.
 
 ```
 PFM-Officiel/
-├── backend/          # API Node.js + Express + SQLite
-├── frontend/         # React + Vite + Tailwind CSS
+├── src/              # Backend API (Node.js + Express + SQLite)
+├── frontend/         # Frontend (React + Vite + Tailwind CSS)
+├── package.json      # Backend dependencies
 └── README.md
 ```
 
 ## 🚀 Déploiement
 
-### Frontend → Vercel
-### Backend → Railway
+### Backend → Railway (Racine du projet)
+### Frontend → Vercel (Dossier frontend/)
 
 ---
 
 ## 📦 Backend (Railway)
 
-### 1. Prérequis
-- Compte Railway (gratuit)
-- Git repository
+### 1. Configuration Railway
 
-### 2. Déploiement
+Railway détecte automatiquement Node.js à la racine.
 
-1. **Créer un projet sur Railway**
-   - Aller sur [railway.app](https://railway.app)
-   - Cliquer sur "New Project"
-   - Sélectionner "Deploy from GitHub repo"
-   - Choisir votre repository et le dossier `backend`
+**Variables d'environnement** :
+```
+ADMIN_TOKEN=votre_token_securise
+PORT=3000
+NODE_ENV=production
+FRONTEND_URL=https://votre-frontend.vercel.app
+```
 
-2. **Configurer les variables d'environnement**
-   - Dans Railway, aller dans l'onglet "Variables"
-   - Ajouter :
-     ```
-     ADMIN_TOKEN=votre_token_securise
-     PORT=3000
-     NODE_ENV=production
-     FRONTEND_URL=https://votre-frontend.vercel.app
-     ```
-
-3. **Déploiement automatique**
-   - Railway détecte automatiquement Node.js
-   - Le build se lance automatiquement
-   - Récupérer l'URL générée (ex: `https://pfm-backend.railway.app`)
+**Déploiement automatique** : Push sur `main` branch
 
 ---
 
 ## 🎨 Frontend (Vercel)
 
-### 1. Prérequis
-- Compte Vercel (gratuit)
-- Git repository
+### 1. Configuration Vercel
 
-### 2. Déploiement
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: `dist`
 
-1. **Créer un projet sur Vercel**
-   - Aller sur [vercel.com](https://vercel.com)
-   - Cliquer sur "New Project"
-   - Importer votre repository GitHub
-   - Sélectionner le dossier `frontend` comme Root Directory
-
-2. **Configurer les variables d'environnement**
-   - Dans Vercel, aller dans "Settings" > "Environment Variables"
-   - Ajouter :
-     ```
-     VITE_API_URL=https://votre-backend.railway.app/api
-     ```
-
-3. **Déploiement**
-   - Vercel détecte automatiquement Vite
-   - Le build se lance automatiquement
-   - Votre site est en ligne !
+**Variables d'environnement** :
+```
+VITE_API_URL=https://votre-backend.railway.app/api
+```
 
 ---
 
@@ -82,7 +57,6 @@ PFM-Officiel/
 ### Backend
 
 ```bash
-cd backend
 npm install
 npm run dev
 ```
