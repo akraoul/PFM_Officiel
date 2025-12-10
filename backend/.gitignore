@@ -4,3 +4,5 @@ dist/
 *.db
 uploads/
 .DS_Store
+*.node
+.cache/
