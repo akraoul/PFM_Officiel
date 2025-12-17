@@ -6,16 +6,24 @@ Application de réservation en ligne pour le salon de coiffure PFM - ESCOBAR.
 
 ```
 PFM-Officiel/
-├── src/              # Backend API (Node.js + Express + SQLite)
+├── backend/          # API (Node.js + Express + SQLite)
+│   ├── src/
+│   ├── package.json
+│   └── pfm.db
 ├── frontend/         # Frontend (React + Vite + Tailwind CSS)
-├── package.json      # Backend dependencies
-└── README.md
+├── README.md
+└── ...
 ```
 
 ## 🚀 Déploiement
 
-### Backend → Railway (Racine du projet)
-### Frontend → Vercel (Dossier frontend/)
+### Backend → Railway
+1. **Root Directory** : Configurez Railway pour utiliser le dossier `backend` comme racine.
+2. **Setup** : Railway détectera automatiquement le projet Node.js.
+
+### Frontend → Vercel
+1. **Root Directory** : Sélectionnez le dossier `frontend`.
+2. **Setup** : Vercel détectera automatiquement Vite.
 
 ---
 
@@ -23,7 +31,7 @@ PFM-Officiel/
 
 ### 1. Configuration Railway
 
-Railway détecte automatiquement Node.js à la racine.
+**Essentiel** : Dans les paramètres de votre service Railway, définissez `Root Directory` sur `/backend`.
 
 **Variables d'environnement** :
 ```
@@ -41,9 +49,9 @@ FRONTEND_URL=https://votre-frontend.vercel.app
 
 ### 1. Configuration Vercel
 
-- Root Directory: `frontend`
-- Build Command: `npm run build`
-- Output Directory: `dist`
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
 
 **Variables d'environnement** :
 ```
@@ -57,6 +65,7 @@ VITE_API_URL=https://votre-backend.railway.app/api
 ### Backend
 
 ```bash
+cd backend
 npm install
 npm run dev
 ```
